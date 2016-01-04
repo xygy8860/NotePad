@@ -50,8 +50,8 @@ public class MainActivity extends ListActivity {
 	private LinearLayout miniLayout;
 	private AdwoAdView adView;
 	private LayoutParams params;
-	//private String pid = "7ae18260fdf1487bb79930924347f411";
-	private String pid = "2b8dbd92edd74a97b3ba6b0189bef125";
+	private String pid = "7ae18260fdf1487bb79930924347f411";
+	//private String pid = "2b8dbd92edd74a97b3ba6b0189bef125";
 	private NativeAdView adViewNative;
 	private ArrayList<HashMap<String, Object>> list;
 	private Adapter adapter;
@@ -100,7 +100,7 @@ public class MainActivity extends ListActivity {
 	}
 
 	private void adwoNative(){
-		adViewNative = new NativeAdView(this,pid,true,new NativeAdListener() {
+		adViewNative = new NativeAdView(this,pid,false,new NativeAdListener() {
 			
 			@Override
 			public void onReceiveAd(String arg0) {

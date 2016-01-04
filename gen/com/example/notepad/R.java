@@ -1536,13 +1536,10 @@ containing a value of this type.
         public static final int edit=0x7f02005a;
         public static final int ic_launcher=0x7f02005b;
         public static final int ic_shunxulianxi=0x7f02005c;
-        public static final int new1=0x7f02005d;
-        public static final int read=0x7f02005e;
-        public static final int save=0x7f02005f;
-        public static final int shape_gray_bg=0x7f020060;
-        public static final int shape_green_bg=0x7f020061;
-        public static final int shape_white_bg=0x7f020062;
-        public static final int t0174b8cc774ef96dca=0x7f020063;
+        public static final int read=0x7f02005d;
+        public static final int shape_gray_bg=0x7f02005e;
+        public static final int shape_green_bg=0x7f02005f;
+        public static final int shape_white_bg=0x7f020060;
     }
     public static final class id {
         public static final int AdLinearLayout=0x7f09003c;
@@ -1575,7 +1572,6 @@ containing a value of this type.
         public static final int dialog_title=0x7f090046;
         public static final int disableHome=0x7f090009;
         public static final int dropdown=0x7f090015;
-        public static final int edit=0x7f090052;
         public static final int edit_query=0x7f090030;
         public static final int end=0x7f090017;
         public static final int expand_activities_button=0x7f090026;
@@ -1602,7 +1598,6 @@ containing a value of this type.
         public static final int progress_horizontal=0x7f090005;
         public static final int radio=0x7f09002f;
         public static final int relative=0x7f09004d;
-        public static final int save=0x7f090053;
         public static final int search_badge=0x7f090032;
         public static final int search_bar=0x7f090031;
         public static final int search_button=0x7f090033;
