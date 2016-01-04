@@ -1,70 +1,143 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.notepad.MainActivity" >
+    
+    <LinearLayout
+         android:id="@+id/AdLinearLayout"
+		 android:layout_width="match_parent"
+		 android:layout_height="wrap_content"
+		 android:gravity="center_horizontal"
+		 android:orientation="horizontal"
+		 android:layout_alignParentBottom="true"
+		 />
 
-    <LinearLayout 
-        
-        android:paddingBottom="@dimen/activity_vertical_margin"
-    	android:paddingLeft="@dimen/activity_horizontal_margin"
-    	android:paddingRight="@dimen/activity_horizontal_margin"
-   	 	android:paddingTop="@dimen/activity_vertical_margin"
-    
-    	android:layout_width="match_parent"
-    	android:layout_height="wrap_content"
-    	android:orientation="horizontal"
-    	android:onClick="onClickNewNote"
+	<LinearLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical"
+	    android:layout_above="@id/AdLinearLayout"
+	    android:layout_alignParentTop="true"
+	    >
+	    
+	    <RelativeLayout 
+	        android:layout_height="50dp"
+	        android:layout_width="match_parent"
+	        android:orientation="horizontal"
+	        android:background="@drawable/background_bg"
+	        >
+	        <ImageView 
+	            android:id="@+id/img"
+	            android:layout_height="45dp"
+	            android:layout_width="40dp"
+	            android:src="@drawable/ic_shunxulianxi"
+	            android:layout_centerVertical="true"
+	            android:layout_marginLeft="16dp"
+	            />
+	        
+	        <TextView 
+	            android:layout_height="wrap_content"
+	            android:layout_width="wrap_content"
+	            android:text="记事本"
+	            android:textSize="18sp"
+	            android:layout_toRightOf="@id/img"
+	            android:layout_centerVertical="true"
+	            android:paddingLeft="5dp"
+	            />
+	        <ImageView 
+	            android:id="@+id/newButton"
+	            android:layout_height="25dp"
+	            android:layout_width="25dp"
+	            android:src="@drawable/circle_gopost"
+	            android:layout_centerVertical="true"
+	            android:layout_alignParentRight="true"
+	            android:layout_marginRight="16dp"
+	            android:onClick="onClickNewNote"
+	            />
+	    </RelativeLayout>
+	    
+	    <!-- 添加分割线效果 -->
+	    <View  
+	   		android:layout_width="fill_parent"  
+	    	android:layout_height="1px" 
+	   		android:background="?android:attr/listDivider"  
+	   	/>  
+	
+	    <LinearLayout 
+	        
+	        android:paddingBottom="@dimen/activity_vertical_margin"
+	    	android:paddingLeft="@dimen/activity_horizontal_margin"
+	    	android:paddingRight="@dimen/activity_horizontal_margin"
+	   	 	android:paddingTop="@dimen/activity_vertical_margin"
+	    
+	    	android:layout_width="match_parent"
+	    	android:layout_height="wrap_content"
+	    	android:orientation="horizontal"
+	        >
+	     <TextView
+	        
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:singleLine="true"
+	        android:layout_weight="1"
+	        android:gravity="left"
+	        android:text="@string/title"
+	        android:textColor="#339933"
+	        android:textSize="14sp"
+	         />
+	        
+	  	 <TextView
+	        
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:singleLine="true"
+	        android:gravity="right"
+	        android:layout_weight="1"
+	        android:text="@string/date"
+	        android:textColor="#339933"
+	        android:textSize="14sp"
+	         />
+	        
+	    </LinearLayout>
+	      
+	    <!-- 添加分割线效果 -->
+	    <View  
+	   		android:layout_width="fill_parent"  
+	    	android:layout_height="1px" 
+	   		android:background="?android:attr/listDivider"  
+	   	/>  
+	   	
+	    <RelativeLayout 
+        android:id="@+id/adwo"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         >
-     <TextView
-        
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:layout_weight="1"
-        android:gravity="left"
-        android:text="@string/title"
-        android:textColor="#339933"
-         />
-        
-  	 <TextView
-        
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:gravity="right"
-        android:layout_weight="1"
-        android:text="@string/date"
-        android:textColor="#339933"
-         />
-        
-    </LinearLayout>
-      
-    <!-- 添加分割线效果 -->
-    <View  
-   		android:layout_width="fill_parent"  
-    	android:layout_height="1px" 
-   		android:background="?android:attr/listDivider"  
-   	/>  
-    
-        <ListView 
-        android:id="@id/android:list"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:drawSelectorOnTop="false"
-        android:scrollbars="vertical"
-        
-        ></ListView>
-        
-    <!-- 添加分割线效果 -->
-    <View  
-   		android:layout_width="fill_parent"  
-    	android:layout_height="1px" 
-   		android:background="?android:attr/listDivider"  
-   	/>  
-</LinearLayout>
+    	</RelativeLayout>
+    	
+    	<!-- 添加分割线效果 -->
+	    <View  
+	   		android:layout_width="fill_parent"  
+	    	android:layout_height="1px" 
+	   		android:background="?android:attr/listDivider"  
+	   	/>  
+	    
+	    <ListView 
+	        android:id="@id/android:list"
+	        android:layout_height="wrap_content"
+	        android:layout_width="match_parent"
+	        android:drawSelectorOnTop="false"
+	        android:scrollbars="vertical"
+	        >
+	    </ListView>
+	  
+	    <!-- 添加分割线效果 -->
+	    <View  
+	   		android:layout_width="fill_parent"  
+	    	android:layout_height="1px" 
+	   		android:background="?android:attr/listDivider"  
+	   	/>  
+	</LinearLayout>
+	
+	
+</RelativeLayout>

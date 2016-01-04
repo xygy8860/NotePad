@@ -1,27 +1,26 @@
 package com.example.notepad;
 
 import java.text.SimpleDateFormat;
-import java.util.Currency;
 import java.util.Date;
 
-import com.example.notepad.MainActivity;
+import cn.waps.AppConnect;
+import cn.waps.AppListener;
 
 import android.support.v7.app.ActionBarActivity;
-import android.text.Editable;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.app.ListActivity;
-import android.content.ClipData.Item;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,19 +34,26 @@ public class NoteEditActivity extends ActionBarActivity {
 	private TextView titleLbl;//只读的标题控件
 	private TextView contentLbl;//只读的内容控件
 	private View view;//分割线效果控件
-	private MenuItem save;//保存按钮
-	private MenuItem edit;//修改按钮
 	private boolean isNew = true;//判断是否新建，默认为true
 	private String idStr = "";//传递来的参数
-	private boolean isLove = false;
-	private boolean isSave = true;//判断数据是否保存
+	private boolean isEdit = true;//判断数据是否保存
 	private String titleStr = "";//根据id从数据库查询出的标题
 	private String contentStr = "";//根据id从数据库查询出的内容
+	
+	private ImageView imgButton;
+	private String titleText;
+	private String contentText;
+	private LinearLayout miniLayout;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		//设置activity无标题，必须放在setContentView之前
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        
 		setContentView(R.layout.activity_note_edit);
+		
+		waps();
 
 		//根据控件id得到控件
 		title = (EditText)findViewById(R.id.title);
@@ -55,6 +61,7 @@ public class NoteEditActivity extends ActionBarActivity {
 		titleLbl = (TextView)findViewById(R.id.titleLbl);
 		contentLbl = (TextView)findViewById(R.id.contentLbl);
 		view = (View)findViewById(R.id.viewNote);
+		imgButton = (ImageView) findViewById(R.id.newButton);
 		
 		//设置内容可以多行滚动
 		contentLbl.setMovementMethod(new ScrollingMovementMethod());
@@ -63,15 +70,14 @@ public class NoteEditActivity extends ActionBarActivity {
 		Intent intent = getIntent();
 		idStr = intent.getStringExtra("id");
 		if("".equals(idStr)){
-			//如果参数为空，则新建
+			//新建
+			imgButton.setBackgroundResource(R.drawable.edit);
+			isEdit = true;
 		}
-		else if("Love".equals(idStr)){
-			title.setText("爱情宣言");
-			content.setText("我爱莉莉^_^");
-			isLove = false;
-		}
-		
 		else{
+			// 阅读
+			imgButton.setBackgroundResource(R.drawable.read);
+			
 			title.setVisibility(View.GONE);//设置标题编辑框不可见
 			content.setVisibility(View.GONE);//设置内容编辑框不可见
 			view.setVisibility(View.VISIBLE);//设置分割线可见
@@ -83,7 +89,87 @@ public class NoteEditActivity extends ActionBarActivity {
 			contentLbl.setText(contentStr);
 			
 			isNew = false;//将新建改为修改
+			isEdit = false;
 		}
+		Date nowTime = new Date(System.currentTimeMillis());
+		SimpleDateFormat sdFormatter = new SimpleDateFormat("MM-dd HH:mm");
+		retStrFormatNowDate = sdFormatter.format(nowTime);
+		
+		imgButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// 修改界面 --> 阅读界面
+				if(isEdit){
+					//获取当前输入的标题和内容
+					titleText = title.getText().toString();
+					contentText = content.getText().toString();
+					//标题为空则给予提醒
+					if("".equals(titleText)){
+						Toast.makeText(getApplicationContext(), "标题不能为空", Toast.LENGTH_SHORT).show();
+					}else{
+						imgButton.setBackgroundResource(R.drawable.read);
+						//如果是新建，插入数据
+						save(titleText, contentText);
+						isEdit = false;
+						
+						title.setVisibility(View.GONE);//设置标题编辑框不可见
+						content.setVisibility(View.GONE);//设置内容编辑框不可见
+						view.setVisibility(View.VISIBLE);//设置分割线可见
+						//如果参数不为空，则根据参数id查询数据，填充标题和内容
+						queryData(idStr);
+						
+						titleLbl.setText(titleStr);
+						titleLbl.setGravity(Gravity.CENTER);
+						contentLbl.setText(contentStr);
+					}
+				}
+				// 阅读界面--> 修改界面
+				else{
+					//获取当前输入的标题和内容
+					titleText = titleLbl.getText().toString();
+					contentText = contentLbl.getText().toString();
+					
+					if("".equals(titleText)){
+						Toast.makeText(getApplicationContext(), "标题不能为空", Toast.LENGTH_SHORT).show();
+					}else{
+						imgButton.setBackgroundResource(R.drawable.edit);
+
+						isEdit = true ;
+						title.setVisibility(View.VISIBLE);//设置标题编辑框可见
+						content.setVisibility(View.VISIBLE);//设置内容编辑框可见
+						view.setVisibility(View.GONE);//设置分割线不可见
+
+						//只读控件重新填充文字
+						contentLbl.setText("内容");
+						contentLbl.setMovementMethod(null);//设置滚动条不再滚动
+						titleLbl.setText("标题");
+						//titleLbl.setGravity(Gravity.LEFT);
+						
+						//将只读控件内容传递到可写控件
+						title.setText(titleStr);
+						content.setText(contentStr);
+					}
+				}
+			}
+		});
+	}
+	
+	/**
+	 * 万普
+	 */
+	private void waps(){
+		miniLayout =(LinearLayout)findViewById(R.id.miniAdLinearLayout);
+		/*AppConnect.getInstance(this).setAdForeColor(getResources().getColor(R.color.green));
+		AppConnect.getInstance(this).showMiniAd(this, miniLayout, 10); //默认10 秒切换一次广告
+*/		
+		// 设置互动广告无数据时的回调监听（该方法必须在showBannerAd之前调用）
+		AppConnect.getInstance(this).setBannerAdNoDataListener(new AppListener() {
+			@Override
+			public void onBannerNoData() {
+				Log.i("123", "banner广告暂无可用数据");
+			}
+		});
+		AppConnect.getInstance(this).showBannerAd(this, miniLayout);
 	}
 
 	/**
@@ -96,122 +182,33 @@ public class NoteEditActivity extends ActionBarActivity {
 		String titleTemp = title.getText().toString();
 		String contentTemp = content.getText().toString();
 		
-		if(isSave){
+		if(isEdit){
 			//如果isSave为真，则判断是否新建
 			//如果为新建，且标题或内容有内容，则提醒保存；否则不提醒保存
-			if(isNew && (!titleStr.equals(titleTemp) || !contentStr.equals(contentTemp))){
-				saveMessage();
-				return;
-			}
-		}
-		//如果数据没有保存，则分情况，新建时无数据不提醒保存，修改时数据未变动不提醒保存
-		else{
-			if(!"".equals(idStr)){
-				queryData(idStr);
-				//修改时如果数据已经修改，则提醒数据保存
-				if(!titleStr.equals(titleTemp) || !contentStr.equals(contentTemp) ){
-					saveMessage();
-					return;
+			if(isNew && titleStr.equals(titleTemp) && contentStr.equals(contentTemp)){
+				super.onBackPressed();
+			}else{
+				if(!isNew){
+					// 如果数据没有改变，也不保存
+					queryData(idStr);
+					if(titleStr.equals(titleTemp) && contentStr.equals(contentTemp)){
+						super.onBackPressed();
+					}
 				}
+				
+				MyDialog dialog = new MyDialog(this);
+				dialog.setTitle("还没有保存，确定退出吗？");
+				dialog.setPosBtnOnClickListener(new MyDialog.OnClickListener() {
+					@Override
+					public void click(View v) {
+						finish();
+					}
+				});
 			}
-			//新建时标题或内容有数据时，提醒保存
-			else if(!"".equals(titleTemp) || !"".equals(contentTemp)){
-				saveMessage();
-				return;
-			}
+		}else{
+			super.onBackPressed();
 		}
-		
-		super.onBackPressed();
 	}
-
-	//弹出数据未保存的提醒
-	private void saveMessage() {
-		Toast.makeText(this, R.string.noSave, Toast.LENGTH_SHORT).show();
-		isSave = true;
-		isNew = false;
-	}
-
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.note_edit, menu);
-		
-		//初始化选项控件，不能用findviewById得到
-		save = (MenuItem)menu.findItem(R.id.save);
-		edit = (MenuItem)menu.findItem(R.id.edit);
-		//如果是新建，则显示保存按钮，编辑按钮隐藏
-		if(isNew){
-			//将编辑图标变为保存图标
-			editToSave();
-		}
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-
-		//获取当前输入的标题和内容
-		String titleText = title.getText().toString();
-		String contentText = content.getText().toString();
-
-		 Date nowTime = new Date(System.currentTimeMillis());
-		 SimpleDateFormat sdFormatter = new SimpleDateFormat("MM-dd HH:mm");
-		 retStrFormatNowDate = sdFormatter.format(nowTime);
-		
-		int id = item.getItemId();
-		//如果点击保存
-		if (id == R.id.save) {
-			//标题为空则给予提醒
-			if("".equals(titleText)){
-				Toast.makeText(this, "标题为空", Toast.LENGTH_SHORT).show();
-				return true;
-			}
-			
-			//如果是新建，插入数据
-			save(titleText, contentText);
-			isSave = true;
-			return true;
-		}
-		//如果是点击的是修改按钮
-		else if(id == R.id.edit){
-			isSave = false ;
-			title.setVisibility(View.VISIBLE);//设置标题编辑框可见
-			content.setVisibility(View.VISIBLE);//设置内容编辑框可见
-			view.setVisibility(View.GONE);//设置分割线不可见
-
-			//只读控件重新填充文字
-			contentLbl.setText("内容");
-			contentLbl.setMovementMethod(null);//设置滚动条不再滚动
-			titleLbl.setText(R.string.title);
-			titleLbl.setGravity(Gravity.LEFT);
-			
-			//将只读控件内容传递到可写控件
-			title.setText(titleStr);
-			content.setText(contentStr);
-			
-			//将编辑图标变为保存图标
-			editToSave();
-			
-			return true;
-		}
-		
-		return super.onOptionsItemSelected(item);
-	}
-
-	/**
-	 * 隐藏编辑按钮，显示保存按钮
-	 */
-	private void editToSave() {
-		edit.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-		save.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		edit.setVisible(false);
-		save.setVisible(true);
-	}
-
 
 	/**
 	 * 根据具体情况保存或更新
